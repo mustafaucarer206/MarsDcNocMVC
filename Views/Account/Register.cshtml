@@ -1,0 +1,633 @@
+@model MarsDcNocMVC.Models.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Yeni Kullanıcı Kaydı";
+}
+
+@section Styles {
+<style>
+    .modern-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .header-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .header-title h1 {
+        margin: 0;
+        font-size: 2.2rem;
+        font-weight: 600;
+    }
+
+    .header-stats {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .header-stat {
+        text-align: center;
+        background: rgba(255,255,255,0.1);
+        padding: 0.8rem 1.2rem;
+        border-radius: 10px;
+        backdrop-filter: blur(10px);
+    }
+
+    .header-stat .value {
+        font-size: 1.4rem;
+        font-weight: bold;
+        display: block;
+    }
+
+    .header-stat .label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .register-container {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .register-card {
+        background: white;
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .register-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        border: none;
+    }
+
+    .card-header h2 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+
+    .card-header .subtitle {
+        margin-top: 0.5rem;
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+
+    .register-form {
+        padding: 2rem;
+    }
+
+    .form-group {
+        position: relative;
+        margin-bottom: 1.8rem;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group select {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1rem 1rem 1rem 3rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        outline: none;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 2.7rem;
+        color: #a0aec0;
+        font-size: 1.1rem;
+    }
+
+    .btn-register {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 12px;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: white;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .login-link a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .login-link a:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+
+    .security-info {
+        background: linear-gradient(135deg, #e6fffa, #f0fff4);
+        border: 1px solid #38d9a9;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    .security-info .icon {
+        color: #38a169;
+        font-size: 1.2rem;
+    }
+
+    .security-info .text {
+        flex: 1;
+        font-size: 0.9rem;
+        color: #2d3748;
+    }
+
+    .password-strength-container {
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 8px;
+        padding: 8px;
+        margin-top: 10px;
+    }
+
+    .password-strength {
+        height: 6px;
+        border-radius: 3px;
+        transition: all 0.3s ease;
+        width: 0%;
+        background: #e9ecef;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .strength-weak { 
+        background: linear-gradient(90deg, #dc3545, #e57373); 
+    }
+
+    .strength-medium { 
+        background: linear-gradient(90deg, #ffc107, #ffd54f); 
+    }
+
+    .strength-strong { 
+        background: linear-gradient(90deg, #28a745, #66bb6a); 
+    }
+
+    .requirement-item {
+        font-size: 13px;
+        margin-bottom: 6px;
+        transition: all 0.3s ease;
+        padding: 4px 8px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.7);
+        border-left: 3px solid #dc3545;
+    }
+
+    .requirement-met {
+        color: #28a745;
+        background: rgba(40, 167, 69, 0.1);
+        border-left-color: #28a745;
+        font-weight: 500;
+    }
+
+    .requirement-not-met {
+        color: #dc3545;
+        background: rgba(220, 53, 69, 0.1);
+        border-left-color: #dc3545;
+    }
+
+    .requirement-item i {
+        transition: all 0.3s ease;
+        width: 16px;
+        text-align: center;
+    }
+
+    .requirement-met i {
+        color: #28a745;
+        transform: scale(1.1);
+    }
+
+    .requirement-not-met i {
+        color: #dc3545;
+    }
+
+    .password-requirements {
+        background: #f7fafc;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-top: 0.5rem;
+        border-left: 4px solid #667eea;
+    }
+
+    .password-requirements h6 {
+        margin: 0 0 0.5rem 0;
+        color: #4a5568;
+        font-weight: 600;
+    }
+
+    @@media (max-width: 768px) {
+        .header-content {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .header-stats {
+            gap: 1rem;
+        }
+
+        .header-title h1 {
+            font-size: 1.8rem;
+        }
+
+        .register-form {
+            padding: 1.5rem;
+        }
+    }
+</style>
+}
+
+<!-- Modern Header -->
+<div class="modern-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="header-title">
+                <i class="fas fa-user-plus fa-2x"></i>
+                <div>
+                    <h1>Yeni Kullanıcı Kaydı</h1>
+                    <div class="subtitle">MarsDcNocMVC Sistem Erişimi</div>
+                </div>
+            </div>
+            <div class="header-stats">
+                <div class="header-stat">
+                    <span class="value" id="currentTime">--:--</span>
+                    <span class="label">Sistem Saati</span>
+                </div>
+                <div class="header-stat">
+                    <span class="value"><i class="fas fa-shield-alt"></i></span>
+                    <span class="label">Güvenli Kayıt</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="register-container">
+        <div class="card register-card">
+            <div class="card-header">
+                <h2><i class="fas fa-user-plus"></i> Hesap Oluştur</h2>
+                <div class="subtitle">Sisteme erişim için yeni hesap oluşturun</div>
+            </div>
+
+            <div class="register-form">
+                <!-- Security Info -->
+                <div class="security-info">
+                    <i class="fas fa-lock icon"></i>
+                    <div class="text">
+                        <strong>Güvenlik:</strong> Tüm bilgileriniz 256-bit SSL şifreleme ile korunmaktadır.
+                    </div>
+                </div>
+
+                <form asp-action="Register" method="post" id="registerForm">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <!-- Username -->
+                    <div class="form-group">
+                        <label asp-for="Username">
+                            <i class="fas fa-user"></i> Kullanıcı Adı
+                        </label>
+                        <i class="fas fa-user input-icon"></i>
+                        <input asp-for="Username" class="form-control" placeholder="Kullanıcı adınızı girin..." />
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                        <small class="form-text text-muted">3-50 karakter arasında, sadece harf, rakam ve alt çizgi</small>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label asp-for="Password">
+                            <i class="fas fa-lock"></i> Şifre
+                        </label>
+                        <i class="fas fa-lock input-icon"></i>
+                        <input asp-for="Password" type="password" class="form-control" placeholder="Güçlü bir şifre oluşturun..." id="password" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                        
+                        <!-- Password Strength Indicator -->
+                        <div class="password-strength-container">
+                            <div class="password-strength" id="passwordStrength"></div>
+                            <div class="d-flex justify-content-between mt-1">
+                                <small class="text-muted">Şifre Gücü:</small>
+                                <small id="strengthText" class="text-muted">Çok Zayıf</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Şifre Gereksinimleri -->
+                        <div class="password-requirements">
+                            <h6><i class="fas fa-check-circle"></i> Şifre Gereksinimleri</h6>
+                            <div class="requirement-item" id="req-length">
+                                <i class="fas fa-times"></i> En az 8 karakter
+                            </div>
+                            <div class="requirement-item" id="req-uppercase">
+                                <i class="fas fa-times"></i> Büyük harf içermeli
+                            </div>
+                            <div class="requirement-item" id="req-lowercase">
+                                <i class="fas fa-times"></i> Küçük harf içermeli
+                            </div>
+                            <div class="requirement-item" id="req-number">
+                                <i class="fas fa-times"></i> Rakam içermeli
+                            </div>
+                            <div class="requirement-item" id="req-special">
+                                <i class="fas fa-times"></i> Özel karakter içermeli
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="form-group">
+                        <label asp-for="ConfirmPassword">
+                            <i class="fas fa-lock"></i> Şifre Tekrar
+                        </label>
+                        <i class="fas fa-lock input-icon"></i>
+                        <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Şifrenizi tekrar girin..." id="confirmPassword" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        <div id="passwordMatch" class="mt-1"></div>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="form-group">
+                        <label asp-for="LocationName">
+                            <i class="fas fa-map-marker-alt"></i> Lokasyon
+                        </label>
+                        <i class="fas fa-map-marker-alt input-icon"></i>
+                        <select asp-for="LocationName" asp-items="ViewBag.Locations" class="form-control">
+                            <option value="">Lokasyon Seçiniz</option>
+                        </select>
+                        <span asp-validation-for="LocationName" class="text-danger"></span>
+                    </div>
+
+                    <div class="submit-section">
+                        <button type="submit" class="btn btn-register">
+                            <i class="fas fa-user-plus"></i> Hesap Oluştur
+                        </button>
+                    </div>
+                </form>
+
+                <div class="login-link">
+                    <p>Zaten hesabınız var mı? <a href="/Account/Login">Giriş Yapın</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Real-time clock
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('tr-TR', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            const timeElement = document.getElementById('currentTime');
+            if (timeElement) {
+                timeElement.textContent = timeString;
+            }
+        }
+        
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Password validation
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirmPassword');
+
+        if (password) {
+            password.addEventListener('input', function() {
+                checkPasswordStrength(this.value);
+                checkPasswordMatch();
+            });
+        }
+
+        if (confirmPassword) {
+            confirmPassword.addEventListener('input', function() {
+                checkPasswordMatch();
+            });
+        }
+
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            
+            // Length check
+            if (password.length >= 8) {
+                updateRequirement('req-length', true);
+                strength++;
+            } else {
+                updateRequirement('req-length', false);
+            }
+
+            // Uppercase check
+            if (/[A-Z]/.test(password)) {
+                updateRequirement('req-uppercase', true);
+                strength++;
+            } else {
+                updateRequirement('req-uppercase', false);
+            }
+
+            // Lowercase check
+            if (/[a-z]/.test(password)) {
+                updateRequirement('req-lowercase', true);
+                strength++;
+            } else {
+                updateRequirement('req-lowercase', false);
+            }
+
+            // Number check
+            if (/[0-9]/.test(password)) {
+                updateRequirement('req-number', true);
+                strength++;
+            } else {
+                updateRequirement('req-number', false);
+            }
+
+            // Special character check
+            if (/[^A-Za-z0-9]/.test(password)) {
+                updateRequirement('req-special', true);
+                strength++;
+            } else {
+                updateRequirement('req-special', false);
+            }
+
+            // Update strength bar with percentage and text
+            const strengthBar = document.getElementById('passwordStrength');
+            const strengthText = document.getElementById('strengthText');
+            const percentage = (strength / 5) * 100;
+            
+            if (strengthBar && strengthText) {
+                if (strength === 0) {
+                    strengthBar.className = 'password-strength';
+                    strengthBar.style.width = '0%';
+                    strengthText.textContent = 'Çok Zayıf';
+                    strengthText.className = 'text-muted';
+                } else if (strength < 3) {
+                    strengthBar.className = 'password-strength strength-weak';
+                    strengthBar.style.width = percentage + '%';
+                    strengthText.textContent = 'Zayıf';
+                    strengthText.className = 'text-danger';
+                } else if (strength < 5) {
+                    strengthBar.className = 'password-strength strength-medium';
+                    strengthBar.style.width = percentage + '%';
+                    strengthText.textContent = 'Orta';
+                    strengthText.className = 'text-warning';
+                } else {
+                    strengthBar.className = 'password-strength strength-strong';
+                    strengthBar.style.width = '100%';
+                    strengthText.textContent = 'Güçlü';
+                    strengthText.className = 'text-success fw-bold';
+                    
+                    // Tam güçlü şifre animasyonu
+                    strengthBar.style.boxShadow = '0 0 10px rgba(40, 167, 69, 0.5)';
+                    setTimeout(() => {
+                        strengthBar.style.boxShadow = 'none';
+                    }, 1000);
+                }
+            }
+        }
+
+        function updateRequirement(id, met) {
+            const element = document.getElementById(id);
+            if (!element) return;
+            
+            const icon = element.querySelector('i');
+            
+            if (met) {
+                element.className = 'requirement-item requirement-met';
+                if (icon) {
+                    icon.className = 'fas fa-check';
+                }
+                
+                // Başarı animasyonu
+                element.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    element.style.transform = 'scale(1)';
+                }, 200);
+            } else {
+                element.className = 'requirement-item requirement-not-met';
+                if (icon) {
+                    icon.className = 'fas fa-times';
+                }
+            }
+        }
+
+        function checkPasswordMatch() {
+            const newPassword = password ? password.value : '';
+            const confirmPwd = confirmPassword ? confirmPassword.value : '';
+            const matchDiv = document.getElementById('passwordMatch');
+
+            if (matchDiv && confirmPwd.length > 0) {
+                if (newPassword === confirmPwd) {
+                    matchDiv.innerHTML = '<small class="text-success"><i class="fas fa-check me-1"></i>Şifreler eşleşiyor</small>';
+                } else {
+                    matchDiv.innerHTML = '<small class="text-danger"><i class="fas fa-times me-1"></i>Şifreler eşleşmiyor</small>';
+                }
+            } else if (matchDiv) {
+                matchDiv.innerHTML = '';
+            }
+        }
+
+        // Form input visual feedback
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('focus', function() {
+                const icon = this.parentElement.querySelector('.input-icon');
+                if (icon) {
+                    icon.style.color = '#667eea';
+                }
+            });
+            
+            input.addEventListener('blur', function() {
+                const icon = this.parentElement.querySelector('.input-icon');
+                if (icon) {
+                    icon.style.color = '#a0aec0';
+                }
+            });
+        });
+
+        // Form validation before submit
+        const registerForm = document.getElementById('registerForm');
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(e) {
+                const pwd = password ? password.value : '';
+                const confirmPwd = confirmPassword ? confirmPassword.value : '';
+                
+                // Check all requirements
+                const isLengthValid = pwd.length >= 8;
+                const isUpperValid = /[A-Z]/.test(pwd);
+                const isLowerValid = /[a-z]/.test(pwd);
+                const isNumberValid = /[0-9]/.test(pwd);
+                const isSpecialValid = /[^A-Za-z0-9]/.test(pwd);
+                const isMatchValid = pwd === confirmPwd;
+                
+                if (!isLengthValid || !isUpperValid || !isLowerValid || !isNumberValid || !isSpecialValid || !isMatchValid) {
+                    e.preventDefault();
+                    alert('Lütfen tüm şifre gereksinimlerini karşıladığınızdan ve şifrelerin eşleştiğinden emin olun.');
+                }
+            });
+        }
+    </script>
+} 

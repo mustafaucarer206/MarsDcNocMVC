@@ -1,0 +1,34 @@
+{
+  "servers": [
+    {
+      "locationName": "Cevahir",
+      "serverName": "Cevahir-LMS",
+      "ipAddress": "192.172.197.71"
+    },
+    {
+      "locationName": "Cevahir", 
+      "serverName": "Cevahir-Vista",
+      "ipAddress": "192.168.11.20"
+    },
+    {
+      "locationName": "Cevahir",
+      "serverName": "Cevahir-DSL", 
+      "ipAddress": "1.1.1.1"
+    },
+    {
+      "locationName": "Cevahir",
+      "serverName": "Cevahir-4G",
+      "ipAddress": "192.172.197.71"
+    },
+    {
+      "locationName": "Cevahir",
+      "serverName": "Cevahir-DCP",
+      "ipAddress": "192.172.197.71"
+    },
+    {
+      "locationName": "Cevahir",
+      "serverName": "Cevahir-Qube",
+      "ipAddress": "192.172.197.75"
+    }
+  ]
+} 

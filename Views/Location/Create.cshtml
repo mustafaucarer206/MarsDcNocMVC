@@ -1,0 +1,409 @@
+@model MarsDcNocMVC.Models.Location
+
+@{
+    ViewData["Title"] = "Yeni Lokasyon";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .main-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .main-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 50px rgba(102, 126, 234, 0.4);
+    }
+
+    .card-header {
+        background: transparent;
+        border: none;
+        padding: 2rem;
+        text-align: center;
+        color: white;
+        position: relative;
+    }
+
+    .card-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(90deg, #fff, transparent);
+        transform: translateX(-50%);
+        border-radius: 2px;
+    }
+
+    .card-body {
+        background: white;
+        padding: 2rem;
+        position: relative;
+    }
+
+    .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-control {
+        height: 50px;
+        border: 2px solid #e1e5e9;
+        border-radius: 10px;
+        padding: 12px 50px 12px 15px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        background: white;
+        transform: translateY(-2px);
+    }
+
+    .form-control.is-valid {
+        border-color: #28a745;
+        background: #f8fff9;
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        background: #fff8f8;
+    }
+
+    textarea.form-control {
+        height: 120px;
+        resize: vertical;
+        font-family: inherit;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-icon {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        transition: all 0.3s ease;
+        z-index: 2;
+    }
+
+    .form-control:focus + .form-icon {
+        color: #667eea;
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .btn-create {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-create:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+
+    .btn-create:active {
+        transform: translateY(0);
+    }
+
+    .btn-back {
+        background: transparent;
+        border: 2px solid #6c757d;
+        color: #6c757d;
+        padding: 10px 25px;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-back:hover {
+        background: #6c757d;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .clock-container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+        padding: 10px 20px;
+        margin-top: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .digital-clock {
+        font-family: 'Courier New', monospace;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: white;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    .info-card {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: none;
+    }
+
+    .info-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .validation-summary-errors {
+        background: linear-gradient(135deg, #dc3545, #e74c3c);
+        color: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border: none;
+    }
+
+    .text-danger {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        font-weight: 500;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .main-card {
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    @@media (max-width: 768px) {
+        .main-card {
+            margin: 1rem;
+            border-radius: 15px;
+        }
+        
+        .card-header, .card-body {
+            padding: 1.5rem;
+        }
+        
+        .btn-create, .btn-back {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-sm-10">
+            <div class="card main-card">
+                <div class="card-header">
+                    <div class="text-center">
+                        <i class="fas fa-map-marker-alt mb-3" style="font-size: 3rem;"></i>
+                        <h2 class="mb-2 fw-bold">Yeni Lokasyon</h2>
+                        <p class="mb-0 opacity-75">Sistem için yeni bir lokasyon tanımlayın</p>
+                        
+                        <div class="clock-container d-inline-block">
+                            <div class="digital-clock" id="digitalClock"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Info Card -->
+                    <div class="card info-card">
+                        <div class="text-center">
+                            <i class="fas fa-info-circle info-icon"></i>
+                            <h6 class="fw-bold mb-2">Lokasyon Bilgileri</h6>
+                            <p class="mb-0 small">Lütfen lokasyon bilgilerini eksiksiz ve doğru şekilde giriniz.</p>
+                        </div>
+                    </div>
+
+                    <form asp-action="Create" method="post" id="locationForm">
+                        <div asp-validation-summary="ModelOnly" class="validation-summary-errors">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Lütfen aşağıdaki hataları düzeltin:</strong>
+                        </div>
+
+                        <!-- Lokasyon Adı -->
+                        <div class="form-group">
+                            <label asp-for="Name" class="form-label">
+                                <i class="fas fa-building text-primary"></i>
+                                Lokasyon Adı
+                            </label>
+                            <input asp-for="Name" class="form-control" placeholder="Örnek: İstanbul Merkez" />
+                            <i class="fas fa-building form-icon"></i>
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <!-- Adres -->
+                        <div class="form-group">
+                            <label asp-for="Address" class="form-label">
+                                <i class="fas fa-map-marked-alt text-success"></i>
+                                Adres
+                            </label>
+                            <textarea asp-for="Address" class="form-control" placeholder="Detaylı adres bilgisini giriniz..."></textarea>
+                            <i class="fas fa-map-marked-alt form-icon" style="top: 25px;"></i>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <!-- Telefon -->
+                        <div class="form-group">
+                            <label asp-for="PhoneNumber" class="form-label">
+                                <i class="fas fa-phone text-info"></i>
+                                Telefon
+                            </label>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="0212 555 0000" />
+                            <i class="fas fa-phone form-icon"></i>
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a asp-action="Index" class="btn btn-back me-md-2">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Geri Dön
+                            </a>
+                            <button type="submit" class="btn btn-create">
+                                <i class="fas fa-plus me-2"></i>
+                                Lokasyon Oluştur
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Digital Clock
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('tr-TR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const dateString = now.toLocaleDateString('tr-TR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            const clockElement = document.getElementById('digitalClock');
+            if (clockElement) {
+                clockElement.innerHTML = `${timeString}<br><small style="font-size: 0.8rem; opacity: 0.8;">${dateString}</small>`;
+            }
+        }
+
+        // Update clock every second
+        setInterval(updateClock, 1000);
+        updateClock(); // Initial call
+
+        // Form Enhancement
+        $(document).ready(function() {
+            // Real-time validation styling
+            $('input, textarea').on('input blur', function() {
+                const $this = $(this);
+                const value = $this.val().trim();
+                
+                // Remove existing classes
+                $this.removeClass('is-valid is-invalid');
+                
+                if (value.length > 0) {
+                    // Basic validation
+                    if ($this.attr('name') === 'Name' && value.length >= 2) {
+                        $this.addClass('is-valid');
+                    } else if ($this.attr('name') === 'PhoneNumber' && /^[\d\s\-\(\)]+$/.test(value)) {
+                        $this.addClass('is-valid');
+                    } else if ($this.attr('name') === 'Address' && value.length >= 10) {
+                        $this.addClass('is-valid');
+                    }
+                }
+            });
+
+            // Form submission with loading state
+            $('#locationForm').on('submit', function(e) {
+                const submitBtn = $(this).find('button[type="submit"]');
+                const originalText = submitBtn.html();
+                
+                submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Oluşturuluyor...');
+                
+                // Re-enable button after 3 seconds if form doesn't submit
+                setTimeout(function() {
+                    submitBtn.prop('disabled', false).html(originalText);
+                }, 3000);
+            });
+
+            // Input focus effects
+            $('.form-control').on('focus', function() {
+                $(this).parent().find('.form-icon').addClass('text-primary');
+            }).on('blur', function() {
+                $(this).parent().find('.form-icon').removeClass('text-primary');
+            });
+
+            // Phone number formatting
+            $('input[name="PhoneNumber"]').on('input', function() {
+                let value = $(this).val().replace(/\D/g, '');
+                if (value.length >= 10) {
+                    value = value.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3');
+                    $(this).val(value);
+                }
+            });
+        });
+
+        // Success notification (if needed)
+        function showSuccessNotification(message) {
+            const notification = $(`
+                <div class="alert alert-success alert-dismissible fade show position-fixed" 
+                     style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                    <i class="fas fa-check-circle me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `);
+            
+            $('body').append(notification);
+            
+            setTimeout(() => {
+                notification.alert('close');
+            }, 5000);
+        }
+    </script>
+} 

@@ -1,0 +1,333 @@
+﻿@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+    .stats-card {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 12px;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .stats-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    }
+    .feature-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+    .feature-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    }
+    .modern-btn {
+        border-radius: 20px;
+        padding: 12px 24px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .modern-btn:hover {
+        transform: translateY(-1px);
+    }
+    .notification-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+    .quick-action-btn {
+        border-radius: 12px;
+        padding: 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .quick-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h3 mb-1 fw-bold">
+                    <i class="fas fa-home me-2"></i>
+                    Mars DC NOC
+                </h1>
+                <p class="mb-0 opacity-75">Veri merkezi yönetim sistemine hoş geldiniz</p>
+            </div>
+            <div class="text-end">
+                <div class="text-white-50">
+                    <small><i class="fas fa-clock me-1"></i>@DateTime.Now.ToString("dd.MM.yyyy HH:mm")</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <h4 class="alert-heading"><i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]</h4>
+                        @if (TempData["WelcomeGuide"] != null)
+                        {
+                            <hr>
+                            <ul class="mb-0">
+                                @foreach (var guide in (string[])TempData["WelcomeGuide"])
+                                {
+                                    <li>@guide</li>
+                                }
+                            </ul>
+                        }
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Bildirimler -->
+        <div class="card notification-card mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-3">
+                    <i class="fas fa-bell text-warning me-2"></i>
+                    Bildirimler
+                </h5>
+                
+                @if (ViewBag.ShowDiskWarning == true && ViewBag.DiskCapacity != null)
+                {
+                    var diskInfo = (ViewBag.DiskCapacity as MarsDcNocMVC.Services.DiskCapacityInfo);
+                    <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Kritik Disk Kapasitesi Uyarısı!
+                        </h5>
+                        <p class="mb-2">
+                            <strong>@diskInfo.DriveLetter</strong> diskinde kullanılabilir alan kritik seviyede:
+                        </p>
+                        <ul class="mb-2">
+                            <li>Toplam: <strong>@diskInfo.TotalSizeGB GB</strong></li>
+                            <li>Kullanılan: <strong>@diskInfo.UsedSpaceGB GB</strong> (%@diskInfo.UsagePercentage)</li>
+                            <li>Boş Alan: <strong class="text-danger">@diskInfo.FreeSpaceGB GB</strong> (%@diskInfo.FreeSpacePercentage)</li>
+                        </ul>
+                        <hr>
+                        <p class="mb-0">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Lütfen gereksiz dosyaları silin veya sistem yöneticinizle iletişime geçin.
+                        </p>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                
+                @if (ViewBag.RecentTransferCount > 0)
+                {
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Son 24 saatte <strong>@ViewBag.SuccessTransferCount</strong> aktarım gerçekleştirildi.
+                        <div class="mt-2">Toplam <strong>@ViewBag.RecentTransferCount</strong> aktarım gerçekleştirilmektedir.</div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Son 24 saatte aktarım gerçekleştirilmedi.
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stats-card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-exchange-alt fa-2x mb-2"></i>
+                        <h4 class="mb-0">@ViewBag.RecentTransferCount</h4>
+                        <small>Aktif Aktarım</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-check-circle fa-2x mb-2"></i>
+                        <h4 class="mb-0">@ViewBag.SuccessTransferCount</h4>
+                        <small>Başarılı Aktarım</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-users fa-2x mb-2"></i>
+                        <h4 class="mb-0">Online</h4>
+                        <small>Kullanıcı Durumu</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stats-card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-server fa-2x mb-2"></i>
+                        <h4 class="mb-0">Aktif</h4>
+                        <small>Sistem Durumu</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card feature-card mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-4">
+                    <i class="fas fa-bolt text-warning me-2"></i>
+                    Hızlı Erişim
+                </h5>
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <a asp-controller="Backup" asp-action="Index" class="btn btn-primary quick-action-btn w-100">
+                            <i class="fas fa-exchange-alt me-2"></i>
+                            <div>Reklam ve Fragman</div>
+                            <small class="d-block text-white-50">Aktarım logları</small>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a asp-controller="Backup" asp-action="DcpOnlineFolders" class="btn btn-success quick-action-btn w-100">
+                            <i class="fas fa-folder me-2"></i>
+                            <div>DCP Online Klasörler</div>
+                            <small class="d-block text-white-50">Klasör yönetimi</small>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a asp-controller="DiskCapacity" asp-action="Index" class="btn btn-info quick-action-btn w-100">
+                            <i class="fas fa-hdd me-2"></i>
+                            <div>Disk Kapasitesi</div>
+                            <small class="d-block text-white-50">Depolama takibi</small>
+                        </a>
+                    </div>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <div class="col-lg-3 col-md-6">
+                            <a asp-controller="User" asp-action="Index" class="btn btn-warning quick-action-btn w-100">
+                                <i class="fas fa-users me-2"></i>
+                                <div>Kullanıcı Yönetimi</div>
+                                <small class="d-block text-white-50">Kullanıcı işlemleri</small>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <div class="feature-icon bg-primary text-white mx-auto">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <h5 class="card-title">Veri Aktarımı</h5>
+                    <p class="card-text text-muted">
+                        Güvenli ve hızlı veri aktarım süreçlerini takip edin ve yönetin.
+                    </p>
+                    <ul class="list-unstyled text-start">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Gerçek zamanlı takip</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Otomatik raporlama</li>
+                        <li><i class="fas fa-check text-success me-2"></i> Hata yönetimi</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <div class="feature-icon bg-success text-white mx-auto">
+                        <i class="fas fa-hdd"></i>
+                    </div>
+                    <h5 class="card-title">Depolama Yönetimi</h5>
+                    <p class="card-text text-muted">
+                        Disk kapasitesini izleyin ve depolama alanınızı optimize edin.
+                    </p>
+                    <ul class="list-unstyled text-start">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Kapasite uyarıları</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Detaylı analiz</li>
+                        <li><i class="fas fa-check text-success me-2"></i> Otomatik temizlik</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <div class="feature-icon bg-info text-white mx-auto">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <h5 class="card-title">Klasör Yönetimi</h5>
+                    <p class="card-text text-muted">
+                        DCP online klasörlerini organize edin ve yönetin.
+                    </p>
+                    <ul class="list-unstyled text-start">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Merkezi yönetim</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Erişim kontrolü</li>
+                        <li><i class="fas fa-check text-success me-2"></i> Senkronizasyon</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Hover efektleri
+            $('.feature-card, .stats-card').hover(
+                function() {
+                    $(this).addClass('shadow-lg');
+                },
+                function() {
+                    $(this).removeClass('shadow-lg');
+                }
+            );
+
+            // Otomatik sayfa yenileme (bildirimler için)
+            @if (User.Identity.IsAuthenticated)
+            {
+                <text>
+                setInterval(function() {
+                    // Disk kapasitesi kontrolü için sayfa yenileme
+                    if ($('.alert-danger').length > 0) {
+                        location.reload();
+                    }
+                }, 300000); // 5 dakikada bir kontrol
+                </text>
+            }
+        });
+    </script>
+}

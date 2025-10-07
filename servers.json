@@ -1,0 +1,59 @@
+﻿{
+  "servers": [
+    {
+      "locationName": "İstanbul",
+      "serverName": "Istanbul-LMS",
+      "ipAddress": "8.8.8.8"
+    },
+    {
+      "locationName": "İstanbul", 
+      "serverName": "Istanbul-Vista",
+      "ipAddress": "8.8.4.4"
+    },
+    {
+      "locationName": "İstanbul",
+      "serverName": "Istanbul-DSL", 
+      "ipAddress": "1.1.1.1"
+    },
+    {
+      "locationName": "İstanbul",
+      "serverName": "Istanbul-4G",
+      "ipAddress": "172.29.89.162"
+    },
+    {
+      "locationName": "İstanbul",
+      "serverName": "Istanbul-DCP",
+      "ipAddress": "9.9.9.9"
+    },
+    {
+      "locationName": "Ankara",
+      "serverName": "Ankara-LMS",
+      "ipAddress": "208.67.222.222"
+    },
+    {
+      "locationName": "Ankara",
+      "serverName": "Ankara-Vista",
+      "ipAddress": "208.67.220.220"
+    },
+    {
+      "locationName": "Ankara",
+      "serverName": "Ankara-DSL",
+      "ipAddress": "77.88.8.8"
+    },
+    {
+      "locationName": "İzmir",
+      "serverName": "Izmir-LMS",
+      "ipAddress": "185.228.168.9"
+    },
+    {
+      "locationName": "İzmir",
+      "serverName": "Izmir-Vista",
+      "ipAddress": "185.228.169.9"
+    },
+    {
+      "locationName": "Test-Offline",
+      "serverName": "Test-Offline-Server",
+      "ipAddress": "192.168.255.254"
+    }
+  ]
+}

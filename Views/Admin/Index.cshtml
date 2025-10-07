@@ -1,0 +1,59 @@
+@{
+    ViewData["Title"] = "Admin Paneli";
+}
+
+<div class="container mt-4">
+    <h2>Admin Paneli</h2>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Lokasyon ve Kullanıcı Yönetimi</h5>
+                </div>
+                <div class="card-body">
+                    <p>Toplu lokasyon ve kullanıcı eklemek için aşağıdaki butonu kullanabilirsiniz.</p>
+                    <p class="text-muted">Not: Bu işlem sadece mevcut olmayan lokasyonlar ve kullanıcılar için çalışacaktır.</p>
+                    <a href="@Url.Action("AddLocationsAndUsers", "Admin")" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i> Lokasyon ve Kullanıcıları Ekle
+                    </a>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Kullanıcı Yönetimi</h5>
+                </div>
+                <div class="card-body">
+                    <p>Kullanıcıları görüntülemek, filtrelemek ve düzenlemek için aşağıdaki butonu kullanabilirsiniz.</p>
+                    <a href="@Url.Action("Users", "Admin")" class="btn btn-primary">
+                        <i class="fas fa-users"></i> Kullanıcıları Yönet
+                    </a>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Lokasyon Yönetimi</h5>
+                </div>
+                <div class="card-body">
+                    <p>Lokasyonları görüntülemek ve adres bilgilerini düzenlemek için aşağıdaki butonu kullanabilirsiniz.</p>
+                    <a href="@Url.Action("Locations", "Admin")" class="btn btn-primary">
+                        <i class="fas fa-map-marker-alt"></i> Lokasyonları Yönet
+                    </a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">İletişim Bilgileri</h5>
+                </div>
+                <div class="card-body">
+                    <p>Kendi telefon numaranızı güncellemek için aşağıdaki butonu kullanabilirsiniz.</p>
+                    <a href="@Url.Action("UpdateContact", "Admin")" class="btn btn-primary">
+                        <i class="fas fa-phone"></i> Telefon Numarasını Güncelle
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

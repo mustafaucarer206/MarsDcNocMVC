@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 PowerShell Scripts - İş Akışı Diyagramları</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        .diagram-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .diagram-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .diagram-title {
+            color: #2d3748;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 600;
+        }
+
+        .diagram-icon {
+            font-size: 2rem;
+        }
+
+        .diagram-content {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .nav-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-menu ul {
+            list-style: none;
+        }
+
+        .nav-menu li {
+            margin-bottom: 8px;
+        }
+
+        .nav-menu a {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: block;
+        }
+
+        .nav-menu a:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .footer {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 20px;
+            margin-top: 30px;
+            color: #718096;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .diagram-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-menu">
+            <ul>
+                <li><a href="#tracker">🔍 Folder Tracker</a></li>
+                <li><a href="#backup">📦 Backup Script</a></li>
+                <li><a href="#disk">💾 Disk Check</a></li>
+                <li><a href="#status">🔄 Status Flow</a></li>
+                <li><a href="#architecture">🏗️ Architecture</a></li>
+            </ul>
+        </div>
+
+        <div class="header">
+            <h1>🔧 PowerShell Scripts İş Akışı Diyagramları</h1>
+            <p>MarsDcNocMVC Sisteminin Görsel Dokümantasyonu</p>
+        </div>
+
+        <div id="tracker" class="diagram-section">
+            <h2 class="diagram-title">
+                <span class="diagram-icon">🔍</span>
+                DCP Online Folder Tracker - İş Akışı
+            </h2>
+            <div class="diagram-content">
+                <div class="mermaid">
+flowchart TD
+    Start([🚀 Script Başlatıldı]) --> InitVars["🔧 Değişkenleri Başlat<br/>- Global sayaçlar<br/>- Database bağlantısı<br/>- Klasör yolları"]
+    
+    InitVars --> CheckDirs{📁 Klasörler mevcut mu?<br/>DCP Online & WatchFolder}
+    CheckDirs -->|Hayır| CreateDirs["📂 Klasörleri Oluştur"]
+    CheckDirs -->|Evet| GetBackupLogs["📋 BackupLogs'dan<br/>İşlenmiş klasörleri al"]
+    CreateDirs --> GetBackupLogs
+    
+    GetBackupLogs --> ScanFolders["🔍 DCP Online klasörünü tara<br/>Tüm alt klasörleri listele"]
+    
+    ScanFolders --> LoopStart{📂 Sonraki klasör var mı?}
+    LoopStart -->|Hayır| CleanupOld["🧹 Eski klasörleri temizle<br/>(72+ saat)"]
+    LoopStart -->|Evet| CheckBackup{🔍 BackupLogs'da var mı?}
+    
+    CheckBackup -->|Evet| SkipFolder["⏭️ Atla<br/>Zaten işlenmiş"] --> NextFolder["➡️ Sonraki klasör"]
+    CheckBackup -->|Hayır| CalcSize["📏 Klasör boyutunu hesapla"]
+    
+    CalcSize --> CheckTracker{🗃️ DcpOnlineTracking'de var mı?}
+    
+    CheckTracker -->|Hayır| NewRecord["🆕 YENİ KAYIT<br/>Status: New<br/>IsProcessed: false"]
+    CheckTracker -->|Evet| GetStatus{📊 Mevcut Status?}
+    
+    GetStatus -->|New| CheckStable{⏱️ Stabil mi?<br/>5+ dakika değişmemiş?}
+    GetStatus -->|Stable| CopyToWatch["📁 WatchFolder'a kopyala"]
+    GetStatus -->|MovedToWatchFolder| AlreadyProcessed["✅ Zaten işlenmiş"] --> NextFolder
+    
+    CheckStable -->|Hayır - Boyut değişmiş| ResetToNew["🔄 Status: New<br/>Boyut güncellenmiş"]
+    CheckStable -->|Evet| UpdateStable["⏰ Status: Stable<br/>Kopyalamaya hazır"]
+    
+    CopyToWatch --> CopyCheck{📋 WatchFolder'da var mı?}
+    CopyCheck -->|Evet| SkipCopy["⏭️ Zaten mevcut"] --> UpdateMoved
+    CopyCheck -->|Hayır| DoCopy["📦 Kopyalama işlemi"]
+    
+    DoCopy --> CopyResult{✅ Başarılı mı?}
+    CopyResult -->|Evet| UpdateMoved["✅ Status: MovedToWatchFolder<br/>IsProcessed: true"]
+    CopyResult -->|Hayır| UpdateError["❌ Status: CopyError<br/>Hata kaydedildi"]
+    
+    NewRecord --> NextFolder
+    ResetToNew --> NextFolder
+    UpdateStable --> NextFolder
+    UpdateMoved --> NextFolder
+    UpdateError --> NextFolder
+    AlreadyProcessed --> NextFolder
+    SkipCopy --> NextFolder
+    
+    NextFolder --> LoopStart
+    
+    CleanupOld --> FinalStats["📊 İstatistikleri hazırla<br/>- Toplam kontrol edilen<br/>- Yeni bulunan<br/>- Kopyalanan<br/>- Başarısız"]
+    
+    FinalStats --> Shutdown["🔚 Graceful Shutdown<br/>- Oturumları kapat<br/>- Kaynakları temizle<br/>- Final rapor"]
+    
+    Shutdown --> End([🏁 Script Tamamlandı])
+    
+    style NewRecord fill:#e1f5fe,stroke:#01579b
+    style UpdateStable fill:#f3e5f5,stroke:#4a148c
+    style UpdateMoved fill:#e8f5e8,stroke:#1b5e20
+    style UpdateError fill:#ffebee,stroke:#b71c1c
+    style ResetToNew fill:#fff3e0,stroke:#e65100
+    style SkipFolder fill:#f5f5f5,stroke:#616161
+    style AlreadyProcessed fill:#e8f5e8,stroke:#388e3c
+                </div>
+            </div>
+        </div>
+
+        <div id="backup" class="diagram-section">
+            <h2 class="diagram-title">
+                <span class="diagram-icon">📦</span>
+                Backup Script - İş Akışı
+            </h2>
+            <div class="diagram-content">
+                <div class="mermaid">
+flowchart TD
+    Start([🚀 Backup Script Başlatıldı]) --> CheckMutex{🔒 Mutex kontrolü<br/>Başka instance çalışıyor mu?}
+    
+    CheckMutex -->|Evet| ExitMutex["❌ Çıkış: Instance zaten çalışıyor"]
+    CheckMutex -->|Hayır| InitVars["🔧 Başlangıç<br/>- FTP bilgileri<br/>- Global değişkenler<br/>- Klasör yolları"]
+    
+    InitVars --> LoadWinSCP["📦 WinSCP DLL yükle"]
+    LoadWinSCP --> LoadSuccess{✅ Başarılı mı?}
+    LoadSuccess -->|Hayır| ExitDLL["❌ Çıkış: DLL yüklenemedi"]
+    LoadSuccess -->|Evet| CreateDirs["📂 Klasörleri oluştur<br/>Local & Destination"]
+    
+    CreateDirs --> CheckDisk["💾 Disk alanı kontrolü<br/>Min: 50GB gerekli"]
+    CheckDisk --> DiskOK{💾 Yeterli alan var mı?}
+    DiskOK -->|Hayır| ExitDisk["❌ Çıkış: Yetersiz disk alanı"]
+    DiskOK -->|Evet| ConnectFTP["🌐 FTP bağlantısı oluştur"]
+    
+    ConnectFTP --> FTPSuccess{🌐 Bağlantı başarılı mı?}
+    FTPSuccess -->|Hayır| ExitFTP["❌ Çıkış: FTP bağlantı hatası"]
+    FTPSuccess -->|Evet| GetDownloaded["📋 İndirilmiş klasörleri al<br/>BackupLogs'dan"]
+    
+    GetDownloaded --> LoopSource{📁 Kaynak dizin döngüsü<br/>REKLAM_DATA & FRAGMAN_DATA}
+    LoopSource -->|Dizin bitir| CloseConnection["🔌 FTP bağlantısını kapat"]
+    LoopSource -->|Sonraki dizin| ListRemote["📂 Uzak klasörleri listele<br/>FTP'den"]
+    
+    ListRemote --> LoopFolder{📂 Klasör döngüsü}
+    LoopFolder -->|Tüm klasörler bitti| LoopSource
+    LoopFolder -->|Sonraki klasör| CheckDownloaded{📋 Daha önce indirilmiş mi?}
+    
+    CheckDownloaded -->|Evet| SkipDownloaded["⏭️ Atla: Zaten indirilmiş"] --> NextFolder
+    CheckDownloaded -->|Hayır| CheckExists{📁 Local'de var mı?}
+    
+    CheckExists -->|Evet| SkipExists["⏭️ Atla: Local'de mevcut"] --> NextFolder
+    CheckExists -->|Hayır| LogStart["📝 İndirme başlangıcı log"]
+    
+    LogStart --> StartDownload["⬇️ İndirme başlat<br/>FTP'den Local'e"]
+    StartDownload --> DownloadSuccess{⬇️ İndirme başarılı mı?}
+    
+    DownloadSuccess -->|Hayır| LogError["❌ Hata logu<br/>Status: 0"] --> NextFolder
+    DownloadSuccess -->|Evet| LogDownloadOK["✅ İndirme tamamlandı logu<br/>Status: 1"]
+    
+    LogDownloadOK --> MoveToDestination["📦 Hedef klasöre taşı<br/>Local'den Destination'a"]
+    MoveToDestination --> MoveSuccess{📦 Taşıma başarılı mı?}
+    
+    MoveSuccess -->|Hayır| LogMoveError["❌ Taşıma hatası logu"] --> NextFolder
+    MoveSuccess -->|Evet| LogMoveOK["✅ Taşıma tamamlandı logu<br/>Transfer complete"]
+    
+    LogMoveOK --> CleanLocal["🧹 Local klasörü temizle"]
+    CleanLocal --> NextFolder["➡️ Sonraki klasör"]
+    NextFolder --> LoopFolder
+    
+    CloseConnection --> LogSummary["📊 Özet log<br/>SYSTEM_SUMMARY"]
+    LogSummary --> CleanupJobs["🧹 Background job'ları temizle"]
+    CleanupJobs --> ReleaseMutex["🔓 Mutex'i serbest bırak"]
+    ReleaseMutex --> FinalStats["📈 Final istatistikler<br/>İşlenen/Başarılı/Başarısız"]
+    
+    FinalStats --> End([🏁 Script Tamamlandı])
+    
+    ExitMutex --> EndError([❌ Hatalı bitiş])
+    ExitDLL --> EndError
+    ExitDisk --> EndError
+    ExitFTP --> EndError
+    
+    style StartDownload fill:#e3f2fd,stroke:#0277bd
+    style LogDownloadOK fill:#e8f5e8,stroke:#2e7d32
+    style LogError fill:#ffebee,stroke:#c62828
+    style MoveToDestination fill:#f3e5f5,stroke:#7b1fa2
+    style LogMoveOK fill:#e8f5e8,stroke:#388e3c
+    style SkipDownloaded fill:#f5f5f5,stroke:#757575
+    style SkipExists fill:#f5f5f5,stroke:#757575
+                </div>
+            </div>
+        </div>
+
+        <div id="disk" class="diagram-section">
+            <h2 class="diagram-title">
+                <span class="diagram-icon">💾</span>
+                Disk Capacity Check - İş Akışı
+            </h2>
+            <div class="diagram-content">
+                <div class="mermaid">
+flowchart TD
+    Start([🚀 Disk Kapasitesi Kontrolü Başlatıldı]) --> InitVars["🔧 Başlangıç<br/>- Database bağlantı<br/>- Lokasyon listesi<br/>- Eşik değerleri"]
+    
+    InitVars --> CreateDirs["📂 Klasörleri oluştur<br/>Log klasörleri"]
+    
+    CreateDirs --> LoadLocations["🌍 Lokasyonları yükle<br/>Locations.txt'den"]
+    LoadLocations --> LoadSuccess{📋 Yükleme başarılı mı?}
+    
+    LoadSuccess -->|Hayır| ExitNoLocations["❌ Çıkış: Lokasyon listesi okunamadı"]
+    LoadSuccess -->|Evet| LoopLocations{🌍 Lokasyon döngüsü}
+    
+    LoopLocations -->|Tüm lokasyonlar kontrol edildi| FinalReport["📊 Final rapor hazırla<br/>Özet istatistikler"]
+    LoopLocations -->|Sonraki lokasyon| ParseLocation["📍 Lokasyonu parse et<br/>Name, Path, Percentage"]
+    
+    ParseLocation --> ValidateFormat{✅ Format geçerli mi?<br/>Name|Path|Percentage}
+    ValidateFormat -->|Hayır| LogFormatError["❌ Format hatası logu<br/>Geçersiz satır"] --> NextLocation
+    ValidateFormat -->|Evet| TestConnection["🔗 Network bağlantısı test<br/>Ping & Path erişimi"]
+    
+    TestConnection --> ConnectionOK{🔗 Bağlantı var mı?}
+    ConnectionOK -->|Hayır| LogConnectionError["❌ Bağlantı hatası logu<br/>Status: Offline"] --> UpdateDatabase
+    ConnectionOK -->|Evet| GetDiskInfo["💾 Disk bilgilerini al<br/>Total & Free Space"]
+    
+    GetDiskInfo --> DiskInfoOK{💾 Disk bilgisi alındı mı?}
+    DiskInfoOK -->|Hayır| LogDiskError["❌ Disk bilgisi hatası<br/>WMI/CIM hatası"] --> UpdateDatabase
+    DiskInfoOK -->|Evet| CalculateUsage["📊 Kullanım yüzdesini hesapla<br/>Used = (Total - Free) / Total * 100"]
+    
+    CalculateUsage --> CheckThreshold{⚠️ Eşik değeri kontrolü}
+    CheckThreshold -->|>= %90| StatusCritical["🔴 Critical<br/>Kritik seviye alarm"] --> LogCritical["🚨 Critical log<br/>Email bildirim hazırla"]
+    CheckThreshold -->|>= %80| StatusWarning["🟡 Warning<br/>Uyarı seviyesi"] --> LogWarning["⚠️ Warning log<br/>İzleme gerekli"]
+    CheckThreshold -->|< %80| StatusNormal["🟢 Normal<br/>Sağlıklı seviye"] --> LogNormal["✅ Normal log<br/>Durum OK"]
+    
+    LogCritical --> PrepareEmail["📧 Email bildirim hazırla<br/>IT ekibi için"]
+    LogWarning --> UpdateDatabase
+    LogNormal --> UpdateDatabase
+    
+    PrepareEmail --> UpdateDatabase["🗃️ Database güncelle<br/>DiskCapacityLogs tablosu"]
+    
+    UpdateDatabase --> DatabaseOK{🗃️ Database güncellemesi başarılı mı?}
+    DatabaseOK -->|Hayır| LogDatabaseError["❌ Database hatası logu"]
+    DatabaseOK -->|Evet| LogSuccess["✅ Başarılı güncelleme logu"]
+    
+    LogDatabaseError --> NextLocation["➡️ Sonraki lokasyon"]
+    LogSuccess --> NextLocation
+    UpdateDatabase --> NextLocation
+    
+    NextLocation --> LoopLocations
+    
+    FinalReport --> SendEmails["📧 Critical email'leri gönder<br/>Topluca bildirim"]
+    SendEmails --> EmailResult{📧 Email gönderimi başarılı mı?}
+    
+    EmailResult -->|Hayır| LogEmailError["❌ Email gönderim hatası"]
+    EmailResult -->|Evet| LogEmailSuccess["✅ Email gönderim başarılı"]
+    
+    LogEmailError --> CleanupLogs["🧹 Eski logları temizle<br/>30+ gün"]
+    LogEmailSuccess --> CleanupLogs
+    
+    CleanupLogs --> GenerateStats["📈 İstatistik raporu<br/>- Normal: X<br/>- Warning: Y<br/>- Critical: Z"]
+    
+    GenerateStats --> End([🏁 Script Tamamlandı])
+    
+    ExitNoLocations --> EndError([❌ Hatalı bitiş])
+    
+    style StatusNormal fill:#e8f5e8,stroke:#2e7d32
+    style StatusWarning fill:#fff8e1,stroke:#f57c00
+    style StatusCritical fill:#ffebee,stroke:#d32f2f
+    style LogCritical fill:#ffcdd2,stroke:#c62828
+    style LogWarning fill:#ffe0b2,stroke:#ef6c00
+    style LogNormal fill:#c8e6c9,stroke:#388e3c
+    style PrepareEmail fill:#e1f5fe,stroke:#0277bd
+    style SendEmails fill:#e8eaf6,stroke:#3f51b5
+                </div>
+            </div>
+        </div>
+
+        <div id="status" class="diagram-section">
+            <h2 class="diagram-title">
+                <span class="diagram-icon">🔄</span>
+                Status Transitions - Durum Geçişleri
+            </h2>
+            <div class="diagram-content">
+                <div class="mermaid">
+stateDiagram-v2
+    [*] --> New : 🆕 İlk keşif<br/>DCP Online'da bulundu<br/>BackupLogs'da yok
+    
+    New --> New : 🔄 Boyut değişikliği<br/>Dosya güncelleniyor<br/>Timer sıfırla
+    
+    New --> Stable : ⏰ Zaman koşulu<br/>5+ dakika boyut değişmedi<br/>Dosya kararlı hale geldi
+    
+    Stable --> New : 🔄 Boyut değişikliği<br/>Tekrar güncelleme var<br/>Timer sıfırla
+    
+    Stable --> MovedToWatchFolder : ✅ Kopyalama başarılı<br/>WatchFolder'a taşındı<br/>İşlem tamamlandı
+    
+    MovedToWatchFolder --> [*] : 🏁 Final durum<br/>İşlem tamamlandı<br/>Backup'a hazır
+    
+    New --> CopyError : ❌ Kopyalama hatası<br/>Stable'dan geçerken<br/>Teknik sorun
+    
+    Stable --> CopyError : ❌ Kopyalama hatası<br/>WatchFolder erişim sorunu<br/>Disk alanı yetersiz
+    
+    CopyError --> New : 🔄 Yeniden deneme<br/>Manuel müdahale sonrası<br/>Durum düzeltildi
+    
+    CopyError --> Stable : 🔄 Durum düzeltme<br/>Dosya kararlı hale geldi<br/>Tekrar kopyalama hazır
+    
+    note right of New
+        🔍 Özellikleri:
+        • IsProcessed = false
+        • İlk boyut kaydı
+        • LastModified kaydedilir
+        • Timer başlatılır
+    end note
+    
+    note right of Stable
+        ⏰ Özellikleri:
+        • IsProcessed = false
+        • 5+ dakika boyut sabit
+        • Kopyalamaya hazır
+        • WatchFolder kontrolü
+    end note
+    
+    note right of MovedToWatchFolder
+        ✅ Özellikleri:
+        • IsProcessed = true
+        • WatchFolder'da mevcut
+        • Backup'a hazır durum
+        • Final status
+    end note
+    
+    note right of CopyError
+        ❌ Özellikleri:
+        • IsProcessed = false
+        • Hata detayları logged
+        • Manual intervention gerekli
+        • Retry durumu
+    end note
+                </div>
+            </div>
+        </div>
+
+        <div id="architecture" class="diagram-section">
+            <h2 class="diagram-title">
+                <span class="diagram-icon">🏗️</span>
+                Sistem Mimarisi - Genel Bakış
+            </h2>
+            <div class="diagram-content">
+                <div class="mermaid">
+graph TB
+    subgraph "📡 Remote FTP Server"
+        FTP[🌐 FTP Server<br/>REKLAM_DATA<br/>FRAGMAN_DATA]
+    end
+    
+    subgraph "🖥️ Local System"
+        subgraph "📁 Folder Structure"
+            DCP[📂 DCP Online<br/>Ana giriş klasörü]
+            WATCH[📂 WatchFolder<br/>Backup'a hazır dosyalar]
+            LOCAL[📂 Local Temp<br/>İndirme geçici alanı]
+            DEST[📂 Destination<br/>Final dosya konumu]
+        end
+        
+        subgraph "🔧 PowerShell Scripts"
+            TRACKER[📜 DcpOnlineFolderTracker.ps1<br/>🔍 Folder monitoring<br/>📊 Status management]
+            BACKUP[📜 BackupScript.ps1<br/>⬇️ FTP download<br/>📦 File transfer]
+            DISK[📜 DiskCapacityCheck.ps1<br/>💾 Space monitoring<br/>⚠️ Alerts]
+        end
+        
+        subgraph "🗄️ Database"
+            DB[(🗃️ SQL Server<br/>MarsDcNocMVC)]
+            
+            subgraph "📊 Tables"
+                TRACKING[🔍 DcpOnlineFolderTracking<br/>Status: New→Stable→MovedToWatchFolder]
+                LOGS[📝 BackupLogs<br/>Download history & status]
+                CAPACITY[💾 DiskCapacityLogs<br/>Space monitoring data]
+            end
+        end
+    end
+    
+    subgraph "🌐 Web Application"
+        WEB[🖥️ ASP.NET Core MVC<br/>http://localhost:5032]
+        
+        subgraph "📄 Web Pages"
+            HOME[🏠 Home Dashboard<br/>Transfer statistics]
+            BACKUP_UI[📦 Backup Management<br/>Status monitoring]
+            DISK_UI[💾 Disk Capacity<br/>Space monitoring]
+            USER[👤 User Management<br/>Account settings]
+        end
+    end
+    
+    FTP -->|📥 Download| BACKUP
+    BACKUP -->|💾 Store Local| LOCAL
+    BACKUP -->|📦 Move to| DEST
+    BACKUP -->|📝 Log| LOGS
+    
+    DCP -->|🔍 Monitor| TRACKER
+    TRACKER -->|📊 Track Status| TRACKING
+    TRACKER -->|📋 Check Processed| LOGS
+    TRACKER -->|✅ Ready Files| WATCH
+    
+    DISK -->|💾 Monitor Space| CAPACITY
+    DISK -->|📧 Send Alerts| EMAIL[📧 Email Notifications]
+    
+    WEB -->|📊 Read Data| DB
+    HOME -->|📈 Display Stats| TRACKING
+    BACKUP_UI -->|📋 Show Logs| LOGS
+    DISK_UI -->|💾 Show Capacity| CAPACITY
+    
+    TRACKING -->|New| TRACKER
+    TRACKER -->|Stable Check| TRACKING
+    TRACKING -->|MovedToWatchFolder| WATCH
+    
+    WATCH -->|🎯 Backup Ready| BACKUP_UI
+    LOGS -->|📊 Statistics| HOME
+    
+    style TRACKER fill:#e3f2fd,stroke:#1976d2
+    style BACKUP fill:#f3e5f5,stroke:#7b1fa2
+    style DISK fill:#e8f5e8,stroke:#388e3c
+    style WEB fill:#fff3e0,stroke:#f57c00
+    style DB fill:#fce4ec,stroke:#c2185b
+    style FTP fill:#e0f2f1,stroke:#00796b
+    
+    style TRACKING fill:#e1f5fe,stroke:#0277bd
+    style LOGS fill:#f3e5f5,stroke:#7b1fa2
+    style CAPACITY fill:#e8f5e8,stroke:#2e7d32
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🎯 MarsDcNocMVC Sistemi - PowerShell Scripts Görsel Dokümantasyonu</p>
+            <p>📅 Oluşturulma Tarihi: 2024</p>
+        </div>
+    </div>
+
+    <script>
+        // Mermaid başlatma
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#667eea',
+                primaryTextColor: '#2d3748',
+                primaryBorderColor: '#4a5568',
+                lineColor: '#718096',
+                sectionBkgColor: '#f7fafc',
+                altSectionBkgColor: '#edf2f7',
+                gridColor: '#e2e8f0',
+                secondaryColor: '#764ba2',
+                tertiaryColor: '#f1f5f9'
+            },
+            flowchart: {
+                htmlLabels: true,
+                curve: 'basis',
+                useMaxWidth: true
+            }
+        });
+    </script>
+</body>
+</html> 

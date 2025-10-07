@@ -1,0 +1,339 @@
+@model MarsDcNocMVC.Models.LoginViewModel
+
+@{
+    ViewData["Title"] = "Giriş";
+    Layout = "_Layout";
+}
+
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+    
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        padding: 2rem 0;
+    }
+    
+    .login-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .login-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    }
+    
+    .login-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        margin: -2rem -2rem 2rem -2rem;
+    }
+    
+    .login-header h2 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.8rem;
+    }
+    
+    .login-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 0.9rem;
+    }
+    
+    .form-floating {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-floating input {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1rem 1rem 1rem 3rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+        position: relative;
+        z-index: 1;
+        text-align: right;
+        direction: rtl;
+    }
+    
+    .form-floating input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        outline: none;
+    }
+    
+    .form-floating label {
+        position: absolute;
+        top: 50%;
+        left: 3rem;
+        transform: translateY(-50%);
+        transition: all 0.3s ease;
+        color: #6c757d;
+        pointer-events: none;
+        font-size: 1rem;
+    }
+    
+    .form-floating input:focus + label,
+    .form-floating input:not(:placeholder-shown) + label {
+        top: 0.5rem;
+        font-size: 0.8rem;
+        color: #667eea;
+        transform: translateY(0);
+    }
+    
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        font-size: 1.1rem;
+        z-index: 10;
+        transition: color 0.3s ease;
+        pointer-events: none;
+    }
+    
+    .form-floating input:focus ~ .input-icon {
+        color: #667eea;
+    }
+    
+    /* Placeholder text alignment - sadece girilen metin sağdan başlayacak */
+    .form-floating input::placeholder {
+        text-align: left;
+        direction: ltr;
+    }
+    
+    /* Validation error text alignment - normal sol hizalama */
+    .form-floating .text-danger {
+        text-align: left;
+        direction: ltr;
+        margin-top: 0.25rem;
+    }
+    
+    .btn-login {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 12px;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-login::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .btn-login:hover::before {
+        left: 100%;
+    }
+    
+    .register-link {
+        text-decoration: none;
+        color: #667eea;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+    
+    .register-link:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+    
+    .validation-error {
+        background: rgba(220, 53, 69, 0.1);
+        border: 1px solid rgba(220, 53, 69, 0.3);
+        color: #dc3545;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .floating-shapes {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
+    }
+    
+    .shape {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .shape:nth-child(1) {
+        width: 80px;
+        height: 80px;
+        left: 10%;
+        animation-delay: 0s;
+    }
+    
+    .shape:nth-child(2) {
+        width: 60px;
+        height: 60px;
+        right: 15%;
+        top: 20%;
+        animation-delay: 2s;
+    }
+    
+    .shape:nth-child(3) {
+        width: 100px;
+        height: 100px;
+        left: 70%;
+        bottom: 20%;
+        animation-delay: 4s;
+    }
+    
+    @@keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+</style>
+
+<div class="floating-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+</div>
+
+<div class="container login-container">
+    <div class="row justify-content-center w-100">
+        <div class="col-md-5 col-lg-4">
+            <div class="card login-card">
+                <div class="card-body p-4">
+                    <div class="login-header">
+                        <div class="mb-3">
+                            <i class="fas fa-rocket fa-2x"></i>
+                        </div>
+                        <h2>Mars DC NOC</h2>
+                    </div>
+
+                    <form asp-action="Login" method="post" id="loginForm">
+                        @if (ViewData.ModelState.ErrorCount > 0)
+                        {
+                            <div class="validation-error">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <div asp-validation-summary="ModelOnly"></div>
+                            </div>
+                        }
+
+                        <div class="form-floating">
+                            <input asp-for="Username" class="form-control" placeholder="Kullanıcı adınızı girin" autocomplete="username" />
+                            <label asp-for="Username">Kullanıcı Adı</label>
+                            <i class="fas fa-user input-icon"></i>
+                            <span asp-validation-for="Username" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating">
+                            <input asp-for="Password" class="form-control" type="password" placeholder="Şifrenizi girin" autocomplete="current-password" />
+                            <label asp-for="Password">Şifre</label>
+                            <i class="fas fa-lock input-icon"></i>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-login text-white">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                Giriş Yap
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center">
+                        <p class="mb-0 text-muted">
+                            Hesabınız yok mu? 
+                            <a asp-action="Register" class="register-link">
+                                <i class="fas fa-user-plus me-1"></i>
+                                Kayıt Ol
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Form submit animasyonu
+            $('#loginForm').on('submit', function(e) {
+                const submitBtn = $(this).find('button[type="submit"]');
+                submitBtn.html('<i class="fas fa-spinner fa-spin me-2"></i>Giriş yapılıyor...');
+                submitBtn.prop('disabled', true);
+            });
+
+            // Input focus efektleri
+            $('.form-floating input').on('focus', function() {
+                $(this).parent().addClass('focused');
+            }).on('blur', function() {
+                if (!$(this).val()) {
+                    $(this).parent().removeClass('focused');
+                }
+            });
+
+            // Klavye kısayolları
+            $(document).on('keypress', function(e) {
+                if (e.which === 13 && e.ctrlKey) { // Ctrl+Enter
+                    $('#loginForm').submit();
+                }
+            });
+
+            // Shake animasyonu hata durumunda
+            @if (ViewData.ModelState.ErrorCount > 0)
+            {
+                <text>
+                $('.login-card').addClass('animate__animated animate__headShake');
+                setTimeout(function() {
+                    $('.login-card').removeClass('animate__animated animate__headShake');
+                }, 1000);
+                </text>
+            }
+
+            // Floating labels için fallback
+            $('.form-floating input').each(function() {
+                if ($(this).val()) {
+                    $(this).parent().addClass('focused');
+                }
+            });
+        });
+    </script>
+} 

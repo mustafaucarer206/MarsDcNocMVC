@@ -1,0 +1,461 @@
+@model IEnumerable<MarsDcNocMVC.Models.Location>
+
+@{
+    ViewData["Title"] = "Lokasyonlar";
+    Layout = "_Layout";
+}
+
+<style>
+    .location-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+    .location-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    }
+    .page-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+    .search-card {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    }
+    .location-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 16px;
+    }
+    .btn-action {
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .btn-action:hover {
+        transform: translateY(-1px);
+    }
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #495057;
+        background-color: #f8f9fa;
+    }
+    .table td {
+        vertical-align: middle;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .stats-badge {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 8px 16px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h3 mb-1 fw-bold">
+                    <i class="fas fa-map-marker-alt me-2"></i>
+                    Lokasyon Yönetimi
+                </h1>
+                <p class="mb-0 opacity-75">Tüm lokasyonları yönetin ve düzenleyin</p>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="stats-badge">
+                    <i class="fas fa-building me-1"></i>
+                    @Model.Count() Lokasyon
+                </div>
+                <div class="stats-badge">
+                    <i class="fas fa-clock me-1"></i>
+                    <span id="lastUpdateTime">@DateTime.Now.ToString("HH:mm")</span>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="autoRefreshToggle" checked>
+                    <label class="form-check-label text-white" for="autoRefreshToggle">
+                        <small><i class="fas fa-sync-alt me-1"></i>Otomatik Yenileme</small>
+                    </label>
+                </div>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Create" class="btn btn-light btn-lg">
+                        <i class="fas fa-plus me-2"></i>
+                        Yeni Lokasyon
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Arama -->
+    <div class="card search-card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-8">
+                    <label class="form-label fw-semibold">
+                        <i class="fas fa-search me-1 text-muted"></i>
+                        Arama
+                    </label>
+                    <input type="text" name="searchString" id="searchString" 
+                           class="form-control" 
+                           placeholder="Lokasyon adı, adres veya telefon ara..." 
+                           value="@ViewBag.CurrentSearch" />
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            <i class="fas fa-search me-2"></i>
+                            Ara
+                        </button>
+                        <a href="@Url.Action("Index")" class="btn btn-secondary">
+                            <i class="fas fa-sync me-1"></i>
+                            Sıfırla
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lokasyonlar -->
+    <div class="card location-card">
+        <div class="card-body p-0">
+            <div id="locationTableContainer">
+                @if (!Model.Any())
+                {
+                    <div class="p-5 text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-map-marker-alt fa-3x text-muted"></i>
+                        </div>
+                        <h5 class="text-muted">Lokasyon Bulunamadı</h5>
+                        <p class="text-muted">Arama kriterlerinizi değiştirerek tekrar deneyin.</p>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Create" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i>
+                                İlk Lokasyonu Ekle
+                            </a>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="locationTable">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4" style="width: 25%">
+                                        <i class="fas fa-building me-1 text-muted"></i>
+                                        Lokasyon
+                                    </th>
+                                    <th style="width: 40%">
+                                        <i class="fas fa-map-pin me-1 text-muted"></i>
+                                        Adres
+                                    </th>
+                                    <th style="width: 15%">
+                                        <i class="fas fa-phone me-1 text-muted"></i>
+                                        Telefon
+                                    </th>
+                                    <th class="pe-4" style="width: 20%">
+                                        <i class="fas fa-cogs me-1 text-muted"></i>
+                                        İşlemler
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="locationTableBody">
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td class="ps-4">
+                                            <div class="d-flex align-items-center">
+                                                <div class="location-icon me-3">
+                                                    <i class="fas fa-building"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">@item.Name</div>
+                                                    <small class="text-muted">Lokasyon</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="text-truncate" style="max-width: 350px;" title="@item.Address">
+                                                <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                                <span>@item.Address</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-phone text-success me-2"></i>
+                                                <span class="fw-medium">@item.PhoneNumber</span>
+                                            </div>
+                                        </td>
+                                        <td class="pe-4">
+                                            <div class="d-flex gap-1">
+                                                <a asp-action="Details" asp-route-id="@item.Id" 
+                                                   class="btn btn-info btn-action" 
+                                                   title="Detaylar">
+                                                    <i class="fas fa-info-circle me-1"></i>
+                                                    Detay
+                                                </a>
+                                                @if (User.IsInRole("Admin"))
+                                                {
+                                                    <a asp-action="Edit" asp-route-id="@item.Id" 
+                                                       class="btn btn-warning btn-action" 
+                                                       title="Düzenle">
+                                                        <i class="fas fa-edit me-1"></i>
+                                                        Düzenle
+                                                    </a>
+                                                    <a asp-action="Delete" asp-route-id="@item.Id" 
+                                                       class="btn btn-danger btn-action" 
+                                                       title="Sil"
+                                                       onclick="return confirm('Bu lokasyonu silmek istediğinizden emin misiniz?')">
+                                                        <i class="fas fa-trash me-1"></i>
+                                                        Sil
+                                                    </a>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if (ViewBag.TotalPages > 1)
+                    {
+                        <div class="p-4 border-top bg-light">
+                            <nav aria-label="Lokasyon sayfalama">
+                                <ul class="pagination justify-content-center mb-0" id="paginationContainer">
+                                    @if (ViewBag.CurrentPage > 1)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, searchString = ViewBag.CurrentSearch })">
+                                                <i class="fas fa-chevron-left"></i>
+                                            </a>
+                                        </li>
+                                    }
+
+                                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                    {
+                                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                            <a class="page-link" href="@Url.Action("Index", new { page = i, searchString = ViewBag.CurrentSearch })">@i</a>
+                                        </li>
+                                    }
+
+                                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, searchString = ViewBag.CurrentSearch })">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let autoRefreshInterval;
+
+        $(document).ready(function() {
+            // Hover efektleri
+            $('.location-card').hover(
+                function() {
+                    $(this).addClass('shadow-lg');
+                },
+                function() {
+                    $(this).removeClass('shadow-lg');
+                }
+            );
+
+            // Otomatik yenileme başlat
+            startAutoRefresh();
+
+            // Otomatik yenileme toggle
+            $('#autoRefreshToggle').change(function() {
+                if (this.checked) {
+                    startAutoRefresh();
+                } else {
+                    stopAutoRefresh();
+                }
+            });
+
+            // Icon hover efektleri
+            $('.location-icon').hover(
+                function() {
+                    $(this).css('transform', 'scale(1.1)');
+                },
+                function() {
+                    $(this).css('transform', 'scale(1)');
+                }
+            );
+
+            // Silme onayı için modern dialog
+            $('a[href*="Delete"]').click(function(e) {
+                e.preventDefault();
+                const locationName = $(this).closest('tr').find('.fw-bold').text();
+                
+                if (confirm(`"${locationName}" lokasyonunu silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz.`)) {
+                    window.location.href = $(this).attr('href');
+                }
+            });
+        });
+
+        function startAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+            
+            autoRefreshInterval = setInterval(function() {
+                refreshLocationData();
+            }, 30000);
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+        }
+
+        function refreshLocationData() {
+            const searchString = $('#searchString').val();
+
+            $.ajax({
+                url: '@Url.Action("GetLocationData", "Location")',
+                type: 'GET',
+                data: { searchString: searchString },
+                success: function(data) {
+                    updateLocationTable(data);
+                    updateLastUpdateTime();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Veri güncelleme hatası:', error);
+                }
+            });
+        }
+
+        function updateLocationTable(data) {
+            const tbody = $('#locationTableBody');
+            tbody.empty();
+
+            if (data.length === 0) {
+                $('#locationTableContainer').html(`
+                    <div class="p-5 text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-map-marker-alt fa-3x text-muted"></i>
+                        </div>
+                        <h5 class="text-muted">Lokasyon Bulunamadı</h5>
+                        <p class="text-muted">Arama kriterlerinizi değiştirerek tekrar deneyin.</p>
+                    </div>
+                `);
+                return;
+            }
+
+            data.forEach(function(location) {
+                const row = `
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="location-icon me-3">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">${location.name}</div>
+                                    <small class="text-muted">Lokasyon</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-truncate" style="max-width: 350px;" title="${location.address}">
+                                <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                <span>${location.address}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-phone text-success me-2"></i>
+                                <span class="fw-medium">${location.phoneNumber}</span>
+                            </div>
+                        </td>
+                        <td class="pe-4">
+                            <div class="d-flex gap-1">
+                                <a href="/Location/Details/${location.id}" class="btn btn-info btn-action" title="Detaylar">
+                                    <i class="fas fa-info-circle me-1"></i>Detay
+                                </a>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a href="/Location/Edit/${location.id}" class="btn btn-warning btn-action" title="Düzenle">
+                                        <i class="fas fa-edit me-1"></i>Düzenle
+                                    </a>
+                                    <a href="/Location/Delete/${location.id}" class="btn btn-danger btn-action" title="Sil" onclick="return confirm('Bu lokasyonu silmek istediğinizden emin misiniz?')">
+                                        <i class="fas fa-trash me-1"></i>Sil
+                                    </a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                tbody.append(row);
+            });
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            $('#lastUpdateTime').text(now.toLocaleTimeString('tr-TR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            }));
+        }
+
+        // Sayfa kapatılırken interval'ı temizle
+        $(window).on('beforeunload', function() {
+            stopAutoRefresh();
+        });
+    </script>
+} 

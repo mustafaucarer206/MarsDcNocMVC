@@ -1,0 +1,342 @@
+@model IEnumerable<MarsDcNocMVC.Models.ServerPingStatus>
+
+@{
+    ViewData["Title"] = "Sunucu Durumları - Tablo Görünümü";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                <i class="fas fa-table text-primary me-2"></i>
+                @ViewData["Title"]
+            </h2>
+            <p class="text-muted mb-0">Klasik tablo görünümünde sunucu durumları</p>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <a href="@Url.Action("Index", "ServerPing")" class="btn btn-outline-primary">
+                <i class="fas fa-th-large me-1"></i> Kart Görünümü
+            </a>
+            <div class="text-muted me-3">
+                <small>Son Güncelleme: <span id="lastUpdateTime">@DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss")</span></small>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="autoRefreshToggle" checked>
+                <label class="form-check-label" for="autoRefreshToggle">
+                    <small><i class="fas fa-sync-alt me-1"></i>Otomatik Yenileme (30s)</small>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modern Filter Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-filter text-primary me-2"></i>Filtreleme ve Arama
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="locationFilter" class="form-label fw-semibold">
+                        <i class="fas fa-map-marker-alt me-1"></i>Lokasyon
+                    </label>
+                    <select class="form-select modern-input" id="locationFilter" name="locationFilter">
+                        <option value="">Tüm Lokasyonlar</option>
+                        @if (ViewBag.Locations != null)
+                        {
+                            @foreach (string location in ViewBag.Locations)
+                            {
+                                <option value="@location" selected="@(ViewBag.LocationFilter == location)">@location</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="searchString" class="form-label fw-semibold">
+                        <i class="fas fa-search me-1"></i>Arama
+                    </label>
+                    <input type="text" class="form-control modern-input" id="searchString" name="searchString" placeholder="Sunucu adı, IP veya lokasyon ara..." value="@ViewBag.SearchString">
+                </div>
+                <div class="col-md-2 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary modern-btn flex-fill">
+                        <i class="fas fa-filter me-1"></i>Filtrele
+                    </button>
+                    <a href="@Url.Action("TableView")" class="btn btn-outline-secondary modern-btn">
+                        <i class="fas fa-undo me-1"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            @ViewBag.Error
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="serverStatusTable">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="border-0">İşletme Adı</th>
+                            <th class="border-0">LMS IP</th>
+                            <th class="border-0">Vista IP</th>
+                            <th class="border-0">DSL IP</th>
+                            <th class="border-0">4G IP</th>
+                            <th class="border-0">DCP Online IP</th>
+                            <th class="border-0">Qube IP</th>
+                        </tr>
+                    </thead>
+                    <tbody id="serverStatusTableBody">
+                        @foreach (var location in Model.GroupBy(s => s.LocationName))
+                        {
+                            <tr>
+                                <td class="align-middle fw-bold">@location.Key</td>
+                                <td class="align-middle">
+                                    @{
+                                        var lmsStatus = location.FirstOrDefault(s => s.ServerName.Contains("LMS"));
+                                        <span class="badge rounded-pill px-3 py-2 @(lmsStatus?.IsOnline == true ? "bg-success" : "bg-danger")">
+                                            @(lmsStatus?.IPAddress ?? "-")
+                                        </span>
+                                    }
+                                </td>
+                                <td class="align-middle">
+                                    @{
+                                        var vistaStatus = location.FirstOrDefault(s => s.ServerName.Contains("Vista"));
+                                        <span class="badge rounded-pill px-3 py-2 @(vistaStatus?.IsOnline == true ? "bg-success" : "bg-danger")">
+                                            @(vistaStatus?.IPAddress ?? "-")
+                                        </span>
+                                    }
+                                </td>
+                                <td class="align-middle">
+                                    @{
+                                        var dslStatus = location.FirstOrDefault(s => s.ServerName.Contains("DSL"));
+                                        <span class="badge rounded-pill px-3 py-2 @(dslStatus?.IsOnline == true ? "bg-success" : "bg-danger")">
+                                            @(dslStatus?.IPAddress ?? "-")
+                                        </span>
+                                    }
+                                </td>
+                                <td class="align-middle">
+                                    @{
+                                        var g4Status = location.FirstOrDefault(s => s.ServerName.Contains("4G"));
+                                        <span class="badge rounded-pill px-3 py-2 @(g4Status?.IsOnline == true ? "bg-success" : "bg-danger")">
+                                            @(g4Status?.IPAddress ?? "-")
+                                        </span>
+                                    }
+                                </td>
+                                <td class="align-middle">
+                                    @{
+                                        var dcpStatus = location.FirstOrDefault(s => s.ServerName.Contains("DCP"));
+                                        <span class="badge rounded-pill px-3 py-2 @(dcpStatus?.IsOnline == true ? "bg-success" : "bg-danger")">
+                                            @(dcpStatus?.IPAddress ?? "-")
+                                        </span>
+                                    }
+                                </td>
+                                <td class="align-middle">
+                                    @{
+                                        var qubeStatus = location.FirstOrDefault(s => s.ServerName.Contains("Qube"));
+                                        <span class="badge rounded-pill px-3 py-2 @(qubeStatus?.IsOnline == true ? "bg-success" : "bg-danger")">
+                                            @(qubeStatus?.IPAddress ?? "-")
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* Modern Inputs */
+        .modern-input {
+            border: 2px solid #e9ecef;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .modern-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        /* Modern Buttons */
+        .modern-btn {
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .modern-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        let autoRefreshInterval;
+        let dataTable;
+
+        $(document).ready(function () {
+            // DataTable'ı başlat
+            dataTable = $('#serverStatusTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Turkish.json"
+                },
+                "pageLength": 25,
+                "order": [[0, "asc"]], // İşletme adına göre sırala
+                "searching": false, // Arama kutusunu kaldır
+                "paging": false, // Sayfalama kaldır
+                "info": false, // Bilgi metnini kaldır
+                "dom": 't' // Sadece tablo göster
+            });
+
+            // Otomatik yenileme başlat
+            startAutoRefresh();
+
+            // Otomatik yenileme toggle
+            $('#autoRefreshToggle').change(function() {
+                if (this.checked) {
+                    startAutoRefresh();
+                } else {
+                    stopAutoRefresh();
+                }
+            });
+
+            // Form submit efekti
+            $('form').on('submit', function() {
+                $(this).find('button[type="submit"]').html('<i class="fas fa-spinner fa-spin me-1"></i>Filtreleniyor...');
+            });
+        });
+
+        function startAutoRefresh() {
+            // Mevcut interval'ı temizle
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+            
+            // 30 saniyede bir güncelle
+            autoRefreshInterval = setInterval(function() {
+                refreshServerStatus();
+            }, 30000);
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+        }
+
+        function refreshServerStatus() {
+            $.ajax({
+                url: '@Url.Action("GetServerStatusData", "ServerPing")',
+                type: 'GET',
+                success: function(data) {
+                    updateTable(data);
+                    updateLastUpdateTime();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Veri güncelleme hatası:', error);
+                }
+            });
+        }
+
+        function updateTable(serverData) {
+            const tbody = $('#serverStatusTableBody');
+            tbody.empty();
+
+            // Lokasyonlara göre grupla
+            const groupedData = {};
+            serverData.forEach(function(server) {
+                if (!groupedData[server.locationName]) {
+                    groupedData[server.locationName] = [];
+                }
+                groupedData[server.locationName].push(server);
+            });
+
+            // Tabloyu güncelle
+            Object.keys(groupedData).sort().forEach(function(locationName) {
+                const servers = groupedData[locationName];
+                
+                const lms = servers.find(s => s.serverName.includes('LMS'));
+                const vista = servers.find(s => s.serverName.includes('Vista'));
+                const dsl = servers.find(s => s.serverName.includes('DSL'));
+                const g4 = servers.find(s => s.serverName.includes('4G'));
+                const dcp = servers.find(s => s.serverName.includes('DCP'));
+                const qube = servers.find(s => s.serverName.includes('Qube'));
+
+                const row = `
+                    <tr>
+                        <td class="align-middle fw-bold">${locationName}</td>
+                        <td class="align-middle">
+                            <span class="badge rounded-pill px-3 py-2 ${lms?.isOnline ? 'bg-success' : 'bg-danger'}">
+                                ${lms?.ipAddress || '-'}
+                            </span>
+                        </td>
+                        <td class="align-middle">
+                            <span class="badge rounded-pill px-3 py-2 ${vista?.isOnline ? 'bg-success' : 'bg-danger'}">
+                                ${vista?.ipAddress || '-'}
+                            </span>
+                        </td>
+                        <td class="align-middle">
+                            <span class="badge rounded-pill px-3 py-2 ${dsl?.isOnline ? 'bg-success' : 'bg-danger'}">
+                                ${dsl?.ipAddress || '-'}
+                            </span>
+                        </td>
+                        <td class="align-middle">
+                            <span class="badge rounded-pill px-3 py-2 ${g4?.isOnline ? 'bg-success' : 'bg-danger'}">
+                                ${g4?.ipAddress || '-'}
+                            </span>
+                        </td>
+                        <td class="align-middle">
+                            <span class="badge rounded-pill px-3 py-2 ${dcp?.isOnline ? 'bg-success' : 'bg-danger'}">
+                                ${dcp?.ipAddress || '-'}
+                            </span>
+                        </td>
+                        <td class="align-middle">
+                            <span class="badge rounded-pill px-3 py-2 ${qube?.isOnline ? 'bg-success' : 'bg-danger'}">
+                                ${qube?.ipAddress || '-'}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+                
+                tbody.append(row);
+            });
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('tr-TR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            $('#lastUpdateTime').text(timeString);
+        }
+
+        // Sayfa kapatılırken interval'ı temizle
+        $(window).on('beforeunload', function() {
+            stopAutoRefresh();
+        });
+    </script>
+} 

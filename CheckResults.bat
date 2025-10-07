@@ -1,0 +1,6 @@
+@echo off
+echo Ping sonuclari kontrol ediliyor...
+sqlcmd -S "34CEVTMS\SQLEXPRESS" -d "master" -i "%~dp0CheckPingResults.sql"
+echo.
+echo Islem tamamlandi. Cikmak icin bir tusa basin...
+pause > nul 

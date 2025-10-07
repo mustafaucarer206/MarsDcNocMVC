@@ -1,0 +1,373 @@
+@model PagedList<MarsDcNocMVC.Models.User>
+
+@{
+    ViewData["Title"] = "Kullanıcılar";
+}
+
+<style>
+    .user-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+    .user-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    }
+    .page-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+    .user-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 18px;
+    }
+    .role-badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    .role-admin {
+        background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+        color: white;
+    }
+    .role-user {
+        background: linear-gradient(135deg, #4ecdc4, #44a08d);
+        color: white;
+    }
+    .btn-action {
+        border-radius: 20px;
+        padding: 6px 16px;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    .btn-action:hover {
+        transform: translateY(-1px);
+    }
+    .stats-card {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 12px;
+        border: none;
+    }
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #495057;
+        background-color: #f8f9fa;
+    }
+    .pagination .page-link {
+        border-radius: 8px;
+        margin: 0 2px;
+        color: #667eea;
+        border: 1px solid #dee2e6;
+    }
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-color: #667eea;
+    }
+    
+    /* Modern Inputs */
+    .modern-input {
+        border: 2px solid #e9ecef;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .modern-input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    /* Modern Buttons */
+    .modern-btn {
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .modern-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h3 mb-1 fw-bold">
+                    <i class="fas fa-users me-2"></i>
+                    Kullanıcı Yönetimi
+                </h1>
+                <p class="mb-0 opacity-75">Sistem kullanıcılarını yönetin ve düzenleyin</p>
+            </div>
+            <a asp-action="Create" class="btn btn-light btn-lg">
+                <i class="fas fa-plus me-2"></i>
+                Yeni Kullanıcı
+            </a>
+        </div>
+    </div>
+
+    <!-- Modern Filter Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-filter text-primary me-2"></i>Filtreleme ve Arama
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="searchString" class="form-label fw-semibold">
+                        <i class="fas fa-search me-1"></i>Kullanıcı Adı Ara
+                    </label>
+                    <input type="text" class="form-control modern-input" id="searchString" name="searchString" 
+                           value="@ViewBag.CurrentSearch" placeholder="Kullanıcı adı veya lokasyon ara...">
+                </div>
+                <div class="col-md-3">
+                    <label for="locationFilter" class="form-label fw-semibold">
+                        <i class="fas fa-map-marker-alt me-1"></i>Lokasyon
+                    </label>
+                    <select class="form-select modern-input" id="locationFilter" name="locationFilter">
+                        <option value="">Tüm Lokasyonlar</option>
+                        @foreach (var location in ViewBag.Locations)
+                        {
+                            <option value="@location" selected="@(ViewBag.CurrentLocation == location)">@location</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="roleFilter" class="form-label fw-semibold">
+                        <i class="fas fa-shield-alt me-1"></i>Rol
+                    </label>
+                    <select class="form-select modern-input" id="roleFilter" name="roleFilter">
+                        <option value="">Tüm Roller</option>
+                        @foreach (var role in ViewBag.Roles)
+                        {
+                            <option value="@role" selected="@(ViewBag.CurrentRole == role)">@role</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary modern-btn w-100">
+                        <i class="fas fa-search me-1"></i>
+                        Filtrele
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- İstatistikler -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stats-card text-center">
+                <div class="card-body">
+                    <i class="fas fa-users fa-2x mb-2"></i>
+                    <h4 class="mb-0">@ViewBag.TotalUsers</h4>
+                    <small>Toplam Kullanıcı</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card text-center">
+                <div class="card-body">
+                    <i class="fas fa-crown fa-2x mb-2"></i>
+                    <h4 class="mb-0">@ViewBag.TotalAdmins</h4>
+                    <small>Admin</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card text-center">
+                <div class="card-body">
+                    <i class="fas fa-user fa-2x mb-2"></i>
+                    <h4 class="mb-0">@ViewBag.TotalRegularUsers</h4>
+                    <small>Kullanıcı</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card text-center">
+                <div class="card-body">
+                    <i class="fas fa-map-marker-alt fa-2x mb-2"></i>
+                    <h4 class="mb-0">@ViewBag.TotalLocations</h4>
+                    <small>Lokasyon</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kullanıcı Tablosu -->
+    <div class="card user-card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">
+                                <i class="fas fa-user me-1 text-muted"></i>
+                                Kullanıcı
+                            </th>
+                            <th>
+                                <i class="fas fa-shield-alt me-1 text-muted"></i>
+                                Rol
+                            </th>
+                            <th>
+                                <i class="fas fa-map-marker-alt me-1 text-muted"></i>
+                                Lokasyon
+                            </th>
+                            <th class="pe-4">
+                                <i class="fas fa-cogs me-1 text-muted"></i>
+                                İşlemler
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-3">
+                                            @user.Username.Substring(0, 1).ToUpper()
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">@user.Username</div>
+                                            <small class="text-muted">Kullanıcı Adı</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="role-badge role-@(user.Role.ToLower())">
+                                        <i class="fas fa-@(user.Role == "Admin" ? "crown" : "user") me-1"></i>
+                                        @user.Role
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                        <span class="fw-medium">@user.LocationName</span>
+                                    </div>
+                                </td>
+                                <td class="pe-4">
+                                    <div class="d-flex gap-2">
+                                        <a asp-action="Edit" asp-route-id="@user.Id" 
+                                           class="btn btn-warning btn-action" 
+                                           title="Düzenle">
+                                            <i class="fas fa-edit me-1"></i>
+                                            Düzenle
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@user.Id" 
+                                           class="btn btn-danger btn-action" 
+                                           title="Sil"
+                                           onclick="return confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')">
+                                            <i class="fas fa-trash me-1"></i>
+                                            Sil
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                <div class="p-4 border-top bg-light">
+                    <nav aria-label="Kullanıcı sayfalama">
+                        <ul class="pagination justify-content-center mb-0">
+                            @if (Model.PageNumber > 1)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = Model.PageNumber - 1, searchString = ViewBag.CurrentSearch, locationFilter = ViewBag.CurrentLocation, roleFilter = ViewBag.CurrentRole })">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                            }
+                            
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = i, searchString = ViewBag.CurrentSearch, locationFilter = ViewBag.CurrentLocation, roleFilter = ViewBag.CurrentRole })">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+                            
+                            @if (Model.PageNumber < Model.TotalPages)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Index", new { pageNumber = Model.PageNumber + 1, searchString = ViewBag.CurrentSearch, locationFilter = ViewBag.CurrentLocation, roleFilter = ViewBag.CurrentRole })">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Hover efektleri
+            $('.user-card').hover(
+                function() {
+                    $(this).addClass('shadow-lg');
+                },
+                function() {
+                    $(this).removeClass('shadow-lg');
+                }
+            );
+
+            // Silme onayı için modern dialog
+            $('a[href*="Delete"]').click(function(e) {
+                e.preventDefault();
+                const userName = $(this).closest('tr').find('.fw-bold').text();
+                
+                if (confirm(`"${userName}" kullanıcısını silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz.`)) {
+                    window.location.href = $(this).attr('href');
+                }
+            });
+
+            // Avatar animasyonları
+            $('.user-avatar').hover(
+                function() {
+                    $(this).css('transform', 'scale(1.1)');
+                },
+                function() {
+                    $(this).css('transform', 'scale(1)');
+                }
+            );
+
+            // Form submit efekti
+            $('form').on('submit', function() {
+                $(this).find('button[type="submit"]').html('<i class="fas fa-spinner fa-spin me-1"></i>Filtreleniyor...');
+            });
+        });
+    </script>
+} 
