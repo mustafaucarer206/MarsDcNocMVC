@@ -114,3 +114,4 @@ ORDER BY LocationName;
 PRINT 'DCP klasör adları film isimleri ile başarıyla güncellendi!'
 PRINT 'DCP Online Folders sayfası: http://localhost:5032/Backup/DcpOnlineFolders'
 
+

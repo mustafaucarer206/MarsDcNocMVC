@@ -184,3 +184,4 @@ PRINT 'BackupLogs tablosu gerçekçi DCP klasör isimleri ile güncellendi!'
 PRINT 'Her lokasyon için en az 5 film backup log''u eklendi!'
 PRINT 'Backup sayfası: http://localhost:5032/Backup'
 
+

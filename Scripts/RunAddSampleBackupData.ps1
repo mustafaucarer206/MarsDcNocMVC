@@ -107,3 +107,4 @@ Write-Host "  Normal çalıştırma: .\RunAddSampleBackupData.ps1" -ForegroundCo
 Write-Host "  Test modu:         .\RunAddSampleBackupData.ps1 -DryRun" -ForegroundColor "Gray"
 Write-Host "  Özel connection:   .\RunAddSampleBackupData.ps1 -ConnectionString 'Server=...'" -ForegroundColor "Gray"
 
+

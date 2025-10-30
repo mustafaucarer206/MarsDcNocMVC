@@ -16,6 +16,7 @@ namespace MarsDcNocMVC.Data
         public DbSet<Location> Locations { get; set; }
         public DbSet<LocationLmsDiscCapacity> LocationLmsDiscCapacity { get; set; }
         public DbSet<ServerPingStatus> ServerPingStatus { get; set; }
+        public DbSet<MovieInfo> Movies { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

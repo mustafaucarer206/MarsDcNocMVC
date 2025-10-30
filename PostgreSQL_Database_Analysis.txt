@@ -1,0 +1,44 @@
+﻿========================================
+
+PostgreSQL Veritabani Analiz Raporu
+
+Tarih: 07.10.2025 15:59:27
+
+========================================
+
+
+TABLOLAR (0 adet):
+
+----------------------------------------
+
+
+
+========================================
+
+TABLO DETAYLARI
+
+========================================
+
+
+========================================
+
+INDEKSLER
+
+========================================
+
+
+psql: error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  database "MoviesBackUp_Analysis" does not exist
+
+
+
+========================================
+
+FOREIGN KEY ILISKILERI
+
+========================================
+
+
+psql: error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  database "MoviesBackUp_Analysis" does not exist
+
+
+

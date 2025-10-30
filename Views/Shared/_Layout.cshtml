@@ -138,6 +138,7 @@
         .dot-green { background-color: #28a745; }
         .dot-orange { background-color: #fd7e14; }
         .dot-red { background-color: #dc3545; }
+        .dot-blue { background-color: #007bff; }
 
         @@keyframes pulse {
             0%, 100% { opacity: 1; }
@@ -389,6 +390,13 @@
                                     <i class="fas fa-server"></i>
                                     Sunucular
                                     <span class="status-dot dot-green"></span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Movies" asp-action="Index" asp-route-salon="LMS">
+                                    <i class="fas fa-film"></i>
+                                    Filmler
+                                    <span class="status-dot dot-blue"></span>
                                 </a>
                             </li>
                         }

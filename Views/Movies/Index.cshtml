@@ -1,0 +1,411 @@
+@model IEnumerable<MarsDcNocMVC.DTOs.MovieDto>
+@{
+    ViewData["Title"] = "Filmler - Cevahir";
+}
+
+<style>
+    .movies-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .filter-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid #e0e0e0;
+    }
+
+    .modern-input {
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+
+    .modern-input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        outline: none;
+    }
+
+    .btn-filter {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 10px;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-filter:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-reset {
+        background: #f0f0f0;
+        border: 2px solid #e0e0e0;
+        padding: 0.75rem 2rem;
+        border-radius: 10px;
+        color: #666;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-reset:hover {
+        background: #e0e0e0;
+        color: #333;
+    }
+
+    .movie-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    .movie-table th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-weight: 600;
+        padding: 1rem;
+        border: none;
+    }
+
+    .movie-table td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .movie-table tbody tr:hover {
+        background: #f8f9ff;
+        transition: all 0.2s ease;
+    }
+
+    .badge-encrypted {
+        background: #ff6b6b;
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+    }
+
+    .badge-not-encrypted {
+        background: #51cf66;
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+    }
+
+    .badge-resolution {
+        background: #4c6ef5;
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        text-align: center;
+    }
+
+    .stats-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #667eea;
+    }
+
+    .stats-label {
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+</style>
+
+    <div class="movies-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1><i class="fas fa-film"></i> Filmler</h1>
+                <p class="mb-0">Tüm film bilgileri ve detayları</p>
+            </div>
+        <div class="col-md-4 text-end">
+            <div class="stats-card d-inline-block">
+                <div class="stats-number">@ViewBag.TotalRecords</div>
+                <div class="stats-label">Toplam Film</div>
+            </div>
+            <div class="stats-card d-inline-block ms-3">
+                <div class="stats-number" style="font-size: 1.5rem;">@Model.Count()</div>
+                <div class="stats-label">Bu Sayfada</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="filter-card">
+    <form method="get" id="filterForm">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label fw-bold"><i class="fas fa-search"></i> Film Ara</label>
+                <input type="text" class="form-control modern-input" name="searchString" 
+                       value="@ViewBag.SearchString" placeholder="Film adı...">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold"><i class="fas fa-map-marker-alt"></i> Lokasyon</label>
+                <select class="form-select modern-input" name="lokasyon">
+                    <option value="" selected="@(string.IsNullOrEmpty(ViewBag.Lokasyon))">Tümü</option>
+                    @if (ViewBag.Lokasyonlar != null)
+                    {
+                        foreach (var lok in ViewBag.Lokasyonlar)
+                        {
+                            <option value="@lok" selected="@(lok == ViewBag.Lokasyon)">@lok</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label fw-bold"><i class="fas fa-server"></i> Content Server</label>
+                <select class="form-select modern-input" name="salon">
+                    <option value="">Tümü</option>
+                    @if (ViewBag.Salonlar != null)
+                    {
+                        foreach (var salon in ViewBag.Salonlar)
+                        {
+                            <option value="@salon" selected="@(salon == ViewBag.Salon)">@salon</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold"><i class="fas fa-film"></i> İçerik Türü</label>
+                <select class="form-select modern-input" name="icerikTuru">
+                    <option value="">Tümü</option>
+                    <option value="feature" selected="@(ViewBag.IcerikTuru == "feature")">Feature</option>
+                    <option value="trailer" selected="@(ViewBag.IcerikTuru == "trailer")">Trailer</option>
+                    <option value="advertisement" selected="@(ViewBag.IcerikTuru == "advertisement")">Reklam</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-12 text-end">
+                <button type="button" class="btn btn-reset" onclick="window.location.href='@Url.Action("Index")'">
+                    <i class="fas fa-redo"></i> Sıfırla
+                </button>
+                <button type="submit" class="btn btn-filter ms-2">
+                    <i class="fas fa-filter"></i> Filtrele
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@if (Model.Any())
+{
+    <div class="mb-3 d-flex justify-content-end">
+        <button id="btnExportExcel" class="btn btn-success me-2">
+            <i class="fas fa-file-excel"></i> Excel İndir
+        </button>
+        <button id="btnExportPdf" class="btn btn-danger">
+            <i class="fas fa-file-pdf"></i> PDF İndir
+        </button>
+    </div>
+    <div class="movie-table">
+        <table class="table table-hover mb-0" id="moviesTable">
+            <thead>
+                <tr>
+                    <th>Film Adı</th>
+                    <th>Süre (dk)</th>
+                    <th>Content Server</th>
+                    <th>İçerik Türü</th>
+                    <th>Lokasyon</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var movie in Model)
+                {
+                    <tr>
+                        <td><strong>@movie.FilmAdi</strong></td>
+                        <td>@(movie.Sure_Dakika?.ToString("N0") ?? "-")</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(movie.SalonAdi))
+                            {
+                                @switch (movie.SalonAdi)
+                                {
+                                    case "LMS":
+                                        <i class="fas fa-server text-primary"></i> <strong>LMS</strong>
+                                        break;
+                                    case "DCP Online":
+                                        <i class="fas fa-cloud text-success"></i> <strong>DCP Online</strong>
+                                        break;
+                                    case "Qube Online":
+                                        <i class="fas fa-cube text-info"></i> <strong>Qube Online</strong>
+                                        break;
+                                    case "DC FTP":
+                                        <i class="fas fa-folder-open text-warning"></i> <strong>DC FTP</strong>
+                                        break;
+                                    case "Watchfolder":
+                                        <i class="fas fa-eye text-secondary"></i> <strong>Watchfolder</strong>
+                                        break;
+                                    case "Ingest":
+                                        <i class="fas fa-upload text-danger"></i> <strong>Ingest</strong>
+                                        break;
+                                    default:
+                                        <i class="fas fa-server text-muted"></i> <strong>@movie.SalonAdi</strong>
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="badge-resolution">@(movie.IcerikTuru ?? "feature")</span>
+                        </td>
+                        <td>
+                            <i class="fas fa-map-marker-alt text-primary"></i> 
+                            <strong>@(movie.Lokasyon ?? "-")</strong>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div class="pagination-wrapper mt-4">
+            <nav aria-label="Film pagination">
+                <ul class="pagination pagination-lg justify-content-center">
+                    @if (ViewBag.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@BuildQueryString(ViewBag.SearchString, ViewBag.Lokasyon, ViewBag.Salon, ViewBag.IcerikTuru, ViewBag.CurrentPage - 1)">
+                                <i class="fas fa-chevron-left"></i> Önceki
+                            </a>
+                        </li>
+                    }
+
+                    @for (int i = Math.Max(1, ViewBag.CurrentPage - 2); i <= Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2); i++)
+                    {
+                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                            <a class="page-link" href="@BuildQueryString(ViewBag.SearchString, ViewBag.Lokasyon, ViewBag.Salon, ViewBag.IcerikTuru, i)">@i</a>
+                        </li>
+                    }
+
+                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@BuildQueryString(ViewBag.SearchString, ViewBag.Lokasyon, ViewBag.Salon, ViewBag.IcerikTuru, ViewBag.CurrentPage + 1)">
+                                Sonraki <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+            <div class="text-center text-muted">
+                <small>Sayfa @ViewBag.CurrentPage / @ViewBag.TotalPages (@ViewBag.TotalRecords toplam kayıt)</small>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> Filtreye uygun film bulunamadı.
+    </div>
+}
+
+@functions {
+    public string BuildQueryString(string searchString, string lokasyon, string salon, string icerikTuru, int page)
+    {
+        var query = new List<string>();
+        
+        if (!string.IsNullOrEmpty(searchString))
+            query.Add($"searchString={Uri.EscapeDataString(searchString)}");
+        
+        if (!string.IsNullOrEmpty(lokasyon))
+            query.Add($"lokasyon={Uri.EscapeDataString(lokasyon)}");
+        
+        if (!string.IsNullOrEmpty(salon))
+            query.Add($"salon={Uri.EscapeDataString(salon)}");
+        
+        if (!string.IsNullOrEmpty(icerikTuru))
+            query.Add($"icerikTuru={Uri.EscapeDataString(icerikTuru)}");
+        
+        if (page > 1)
+            query.Add($"page={page}");
+        
+        return query.Count > 0 ? "?" + string.Join("&", query) : "";
+    }
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#moviesTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/tr.json"
+                },
+                "pageLength": 100,
+                "order": [[0, "asc"]],
+                "responsive": true,
+                "searching": false,
+                "lengthChange": false,
+                "info": false,
+                "paging": false
+            });
+
+            // Excel Export
+            $('#btnExportExcel').click(function () {
+                var searchString = '@ViewBag.SearchString';
+                var lokasyon = '@ViewBag.Lokasyon';
+                var salon = '@ViewBag.Salon';
+                var icerikTuru = '@ViewBag.IcerikTuru';
+
+                var url = '@Url.Action("ExportExcel", "Movies")' +
+                    '?searchString=' + encodeURIComponent(searchString) +
+                    '&lokasyon=' + encodeURIComponent(lokasyon) +
+                    '&salon=' + encodeURIComponent(salon) +
+                    '&icerikTuru=' + encodeURIComponent(icerikTuru);
+
+                window.location.href = url;
+            });
+
+            // PDF Export
+            $('#btnExportPdf').click(function () {
+                var searchString = '@ViewBag.SearchString';
+                var lokasyon = '@ViewBag.Lokasyon';
+                var salon = '@ViewBag.Salon';
+                var icerikTuru = '@ViewBag.IcerikTuru';
+
+                var url = '@Url.Action("ExportPdf", "Movies")' +
+                    '?searchString=' + encodeURIComponent(searchString) +
+                    '&lokasyon=' + encodeURIComponent(lokasyon) +
+                    '&salon=' + encodeURIComponent(salon) +
+                    '&icerikTuru=' + encodeURIComponent(icerikTuru);
+
+                window.location.href = url;
+            });
+        });
+    </script>
+}
+

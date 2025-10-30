@@ -95,3 +95,4 @@ ORDER BY Timestamp DESC;
 
 PRINT N'UTF-8 uyumlu veriler başarıyla eklendi!'
 
+
